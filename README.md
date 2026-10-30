@@ -1,11 +1,11 @@
-# Experiment 9 – Implement Launcher Icon in Android Studio
+# Experiment 11 – Implement Google Maps in Android Studio
 
 📌 **Description**
-This experiment is developed using Android Studio as part of the Mobile Application Development Lab. It demonstrates the implementation and customization of an Android application launcher icon using XML drawable resources.
+This experiment is developed using Android Studio as part of the Mobile Application Development Lab. It demonstrates the integration of the Google Maps SDK into an Android application. 
 
-The experiment uses a vector drawable XML file to define the foreground design of the application icon. It also uses a background resource to configure the icon's appearance. These resources help create an application icon that appears on the device's home screen and in the application launcher.
+The application utilizes a `SupportMapFragment` to display an interactive map. It handles runtime permissions for location and internet access, features custom map markers, animates the camera to specific geographical coordinates, and uses interactive UI overlays to display tapped coordinates.
 
-This experiment provides practical experience in Android resource management, XML-based vector graphics, drawable resources, and launcher icon configuration.
+This experiment provides practical experience with third-party SDK integration, API Key management in the Android Manifest, and location-based services.
 
 👨‍💻 **Author**
 *   **Name:** Debayan Saha
@@ -13,40 +13,35 @@ This experiment provides practical experience in Android resource management, XM
 *   **USN:** 25MCAR0129
 
 🚀 **Features**
-*   Implements an Android application launcher icon.
-*   Uses XML vector drawable resources.
-*   Defines the icon foreground using `ic_launcher_foreground.xml`.
-*   Configures the icon background using `ic_launcher_background.xml`.
-*   Organizes drawable resources in the Android project.
-*   Uses Android Studio for resource development.
-*   Supports launcher icon configuration through the mipmap resources.
-*   Demonstrates XML-based graphic customization.
+*   Integrates Google Maps SDK for Android.
+*   Displays a full-screen interactive map using `SupportMapFragment`.
+*   Implements `OnMapReadyCallback` for map initialization.
+*   Animates camera movement to predefined and dynamic coordinates.
+*   Adds custom markers on the map upon user interaction.
+*   Displays tapped coordinates in a modern CardView overlay.
+*   Secures Google Maps API Key via `AndroidManifest.xml` metadata.
 
 🛠️ **Technologies Used**
 *   Android Studio
-*   XML
-*   Android SDK
-*   Vector Drawable
-*   Android Drawable Resources
+*   Kotlin
+*   Google Maps SDK (Play Services)
+*   XML Layouts (CoordinatorLayout, CardView, FloatingActionButton)
 *   Gradle
-*   Kotlin (for the Android application)
 
 📂 **Project Structure**
 ```text
-exp9/
+exp11/
 ├── app/
+│   ├── build.gradle.kts (Contains Google Maps dependencies)
 │   └── src/
 │       └── main/
-│           ├── AndroidManifest.xml
+│           ├── AndroidManifest.xml (Contains API Key metadata & Permissions)
 │           ├── java/
 │           │   └── com.example.myapplication/
+│           │       └── MainActivity.kt (Implements OnMapReadyCallback)
 │           └── res/
-│               ├── drawable/
-│               │   ├── border_bg.xml
-│               │   ├── ic_launcher_background.xml
-│               │   └── ic_launcher_foreground.xml
 │               ├── layout/
-│               │   └── activity_main.xml
+│               │   └── activity_main.xml (MapFragment & Overlay UI)
 │               ├── mipmap/
 │               ├── values/
 │               │   ├── colors.xml
@@ -56,12 +51,11 @@ exp9/
 │                   ├── backup_rules.xml
 │                   └── data_extraction_rules.xml
 ├── build.gradle.kts
-├── gradle/
 ├── gradle.properties
 ├── gradlew
 ├── gradlew.bat
-├── settings.gradle.kts
+└── settings.gradle.kts
 ```
 
 📸 **Output**
-*(Screenshots to be added here)*
+*(Screenshots of the interactive Google Map to be added here)*
