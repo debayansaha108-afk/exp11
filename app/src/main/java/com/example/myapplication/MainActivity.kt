@@ -1,77 +1,64 @@
 package com.example.myapplication
 
-import android.Manifest
-import android.content.Intent
-import android.content.pm.PackageManager
 import android.os.Bundle
-import android.provider.ContactsContract
-import android.widget.Toast
-import androidx.activity.result.contract.ActivityResultContracts
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.ContextCompat
-import androidx.fragment.app.Fragment
-import com.example.myapplication.data.ContactsRepository
-import com.example.myapplication.ui.HomeFragment
+import com.google.android.gms.maps.CameraUpdateFactory
+import com.google.android.gms.maps.GoogleMap
+import com.google.android.gms.maps.OnMapReadyCallback
+import com.google.android.gms.maps.SupportMapFragment
+import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.MarkerOptions
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), OnMapReadyCallback {
 
-    lateinit var repository: ContactsRepository
-        private set
-
-    private val requestPermissionLauncher =
-        registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
-            val readGranted = permissions[Manifest.permission.READ_CONTACTS] ?: false
-            val writeGranted = permissions[Manifest.permission.WRITE_CONTACTS] ?: false
-            
-            if (readGranted && writeGranted) {
-                navigateTo(HomeFragment())
-            } else {
-                Toast.makeText(this, "Permissions required to manage contacts", Toast.LENGTH_LONG).show()
-            }
-        }
-
-    private val pickContactLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-        if (result.resultCode == RESULT_OK) {
-            val data = result.data?.data
-            data?.let {
-                // Here we get temporary access to the picked contact URI (Android 17+ contact picker behavior when using correct intent)
-                Toast.makeText(this, "Contact Picked: $it", Toast.LENGTH_LONG).show()
-            }
-        }
-    }
+    private lateinit var mMap: GoogleMap
+    private lateinit var tvLocationInfo: TextView
+    private val defaultLocation = LatLng(28.6139, 77.2090) // Default: New Delhi, India
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        repository = ContactsRepository(this)
+        tvLocationInfo = findViewById(R.id.tv_location_info)
 
-        if (savedInstanceState == null) {
-            checkPermissionsAndStart()
+        // Obtain the SupportMapFragment and get notified when the map is ready to be used.
+        val mapFragment = supportFragmentManager
+            .findFragmentById(R.id.map) as SupportMapFragment
+        mapFragment.getMapAsync(this)
+
+        val fabMyLocation = findViewById<FloatingActionButton>(R.id.fab_my_location)
+        fabMyLocation.setOnClickListener {
+            if (::mMap.isInitialized) {
+                // Move camera back to default location with animation
+                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(defaultLocation, 12f))
+                tvLocationInfo.text = "Centered on New Delhi"
+            }
         }
     }
 
-    private fun checkPermissionsAndStart() {
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_CONTACTS) == PackageManager.PERMISSION_GRANTED &&
-            ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_CONTACTS) == PackageManager.PERMISSION_GRANTED) {
-            navigateTo(HomeFragment())
-        } else {
-            requestPermissionLauncher.launch(
-                arrayOf(Manifest.permission.READ_CONTACTS, Manifest.permission.WRITE_CONTACTS)
-            )
+    /**
+     * Manipulates the map once available.
+     * This callback is triggered when the map is ready to be used.
+     * This is where we can add markers or lines, add listeners or move the camera.
+     */
+    override fun onMapReady(googleMap: GoogleMap) {
+        mMap = googleMap
+
+        // Add a marker in New Delhi and move the camera
+        mMap.addMarker(MarkerOptions().position(defaultLocation).title("Marker in New Delhi"))
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(defaultLocation, 10f))
+
+        // Set a listener for map clicks to show it's interactive
+        mMap.setOnMapClickListener { latLng ->
+            mMap.clear() // Clear old markers
+            mMap.addMarker(MarkerOptions().position(latLng).title("Custom Marker"))
+            mMap.animateCamera(CameraUpdateFactory.newLatLng(latLng))
+            
+            val formattedLat = String.format("%.4f", latLng.latitude)
+            val formattedLng = String.format("%.4f", latLng.longitude)
+            tvLocationInfo.text = "Tapped: $formattedLat, $formattedLng"
         }
-    }
-
-    fun navigateTo(fragment: Fragment) {
-        supportFragmentManager.beginTransaction()
-            .replace(R.id.fragment_container, fragment)
-            .addToBackStack(null)
-            .commit()
-    }
-
-    fun launchContactPicker() {
-        // Launch standard contact picker
-        val pickContactIntent = Intent(Intent.ACTION_PICK, ContactsContract.Contacts.CONTENT_URI)
-        pickContactLauncher.launch(pickContactIntent)
     }
 }
